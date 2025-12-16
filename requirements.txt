@@ -16,8 +16,7 @@ flask==2.3.3
 # MLOps/Tracking Library (REQUIRED for 'import mlflow' in register_model.py)
 mlflow==2.10.2
 
-# Model Creation Library (REQUIRED for loading the .pkl files)
-pycaret==3.2.0
+
 
 # Other potential packages your models might need:
 # If you confirm they used other libraries, add them here.
