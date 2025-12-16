@@ -6,7 +6,7 @@ import os
 # ----------------------------------------------------------------------------------
 # CRITICAL STEP 1: Set the Tracking URI to the Tenant-Level MLflow
 # You must replace this placeholder with your actual URI.
-mlflow.set_tracking_uri("http://asa-c25d20a2-8350-4950-8064-1d8a819e702c.kt-wast-app.svc.cluster.local:80")
+mlflow.set_tracking_uri("http://asa-532836a6-18bc-4f86-8be4-dc52ae067fcb.kt-wast-app.svc.cluster.local:80")
 # ----------------------------------------------------------------------------------
 
 # ----------------------------------------------------------------------------------
