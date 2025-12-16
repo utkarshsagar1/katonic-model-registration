@@ -1,40 +1,45 @@
-
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
 import pickle
-import numpy as np 
-from typing import Any, Union,Dict
-import os
-import json
-
+import numpy as np
 
 def loadmodel(logger):
-    """Get the model"""
-    TRAINED_MODEL_FILEPATH = f"model/model_pkl"
-    logger.info(f"model path:{TRAINED_MODEL_FILEPATH}")
-    logger.info("loading model")
-    with open(TRAINED_MODEL_FILEPATH , 'rb') as f:
-        clfdt = pickle.load(f)
-    logger.info("returning model object")    
-    return clfdt  
-
-def preprocessing(df:np.ndarray,logger):
-    """ Applies preprocessing techniques to the raw data"""
-    ## in template keep this False by default, if its there then the return result will be other than False
-    logger.info("applying standardard scaler")
-    scaler = StandardScaler()
-    data_df = scaler.fit_transform(df)
-    logger.info("applied scaling successfully")
-    return data_df
-    
-def predict(features: np.ndarray,model:Any,logger) -> Dict[str, str]:
-    """Predicts the results for the given inputs"""
+    """Load the model - called once during deployment startup"""
     try:
-        logger.info("model prediction")
-        prediction = model.predict(features)
-        probabilities = model.predict_proba(features)[0]
+        logger.info("Loading model...")
+        with open('model/model.pkl', 'rb') as f:
+            model = pickle.load(f)
+        logger.info("Model loaded successfully")
+        return model
     except Exception as e:
-        logger.info(e)
-        return(e)
-    
-    return prediction
+        logger.error(f"Error loading model: {str(e)}")
+        raise
+
+def preprocessing(data, logger):
+    """Optional: preprocess input data"""
+    try:
+        # If no preprocessing needed, return False
+        if not data:
+            return False
+        
+        # Convert to numpy array if needed
+        processed_data = np.array(data['data'])
+        logger.info(f"Data preprocessed: shape {processed_data.shape}")
+        return processed_data
+    except Exception as e:
+        logger.error(f"Error in preprocessing: {str(e)}")
+        return False
+
+def predict(data, model, logger):
+    """Make predictions"""
+    try:
+        logger.info("Making predictions...")
+        predictions = model.predict(data)
+        logger.info(f"Predictions generated: {len(predictions)}")
+        
+        # Return in expected format
+        return {
+            "predictions": predictions.tolist(),
+            "status": "success"
+        }
+    except Exception as e:
+        logger.error(f"Error in prediction: {str(e)}")
+        return {"error": str(e), "status": "failed"}
