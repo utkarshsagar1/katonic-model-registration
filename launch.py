@@ -5,7 +5,7 @@ def loadmodel(logger):
     """Load the model - called once during deployment startup"""
     try:
         logger.info("Loading model...")
-        with open('model/model.pkl', 'rb') as f:
+        with open('model/classification.pkl', 'rb') as f:
             model = pickle.load(f)
         logger.info("Model loaded successfully")
         return model
