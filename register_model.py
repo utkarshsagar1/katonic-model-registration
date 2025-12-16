@@ -1,31 +1,49 @@
 import mlflow
 import mlflow.sklearn
-import pickle
+import joblib 
 import os
+
+# ----------------------------------------------------------------------------------
+# CRITICAL STEP 1: Set the Tracking URI to the Tenant-Level MLflow
+# You must replace this placeholder with your actual URI.
+mlflow.set_tracking_uri("http://asa-c25d20a2-8350-4950-8064-1d8a819e702c.kt-wast-app.svc.cluster.local:80")
+# ----------------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------------
+# CRITICAL STEP 2: Set the Experiment Name
+# This ensures the runs show up under a specific experiment, not "Default".
+mlflow.set_experiment("Meralco_Model_Registration")
+# ----------------------------------------------------------------------------------
+
 
 # Assume your models are in the 'model/' subdirectory
 CLASSIFICATION_MODEL_PATH = "model/classification.pkl"
 CLUSTERING_MODEL_PATH = "model/clustering.pkl"
 
 # --- MLflow Setup ---
-# Katonic usually sets the TRACKING_URI automatically, but we start a run.
-with mlflow.start_run(run_name="Meralco_Initial_Registration") as run:
+# This run will now be logged under the "Meralco_Model_Registration" experiment
+with mlflow.start_run(run_name="Initial_Registration_v2") as run: # Changed run_name slightly for clarity
 
-    # 1. Load the model from your local .pkl file
-    with open(CLASSIFICATION_MODEL_PATH, 'rb') as f:
-        classification_model = pickle.load(f)
+    # 1. Load the classification model from your local .pkl file using joblib
+    try:
+        classification_model = joblib.load(CLASSIFICATION_MODEL_PATH)
+    except Exception as e:
+        print(f"Error loading classification model with joblib: {e}")
+        raise e
 
     # 2. Log the model artifact and register it
-    # This logs it as a scikit-learn model 'flavor'
     mlflow.sklearn.log_model(
         sk_model=classification_model,
         artifact_path="classification_model_artifact",
-        registered_model_name="Meralco_Classification_Model" # This is the name in the registry!
+        registered_model_name="Meralco_Classification_Model"
     )
 
     # 3. Repeat for the second model (Clustering)
-    with open(CLUSTERING_MODEL_PATH, 'rb') as f:
-        clustering_model = pickle.load(f)
+    try:
+        clustering_model = joblib.load(CLUSTERING_MODEL_PATH)
+    except Exception as e:
+        print(f"Error loading clustering model with joblib: {e}")
+        raise e
 
     mlflow.sklearn.log_model(
         sk_model=clustering_model,
